@@ -1,6 +1,6 @@
+import { Box, Stack, Typography } from "@mui/material";
 import React, { memo } from "react";
 import { Link } from "../styles/StyledComponents";
-import { Stack, Typography, Box } from "@mui/material";
 import AvatarCard from "./AvatarCard";
 
 const ChatItem = ({ avatar = [], name, _id, groupChat = false, sameSender, isOnline, newMessageAlert, index = 0, handleDeleteChat }) => {

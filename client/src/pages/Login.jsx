@@ -93,7 +93,8 @@ const Login = () => {
                 >
                   SIGN UP INSTEAD
                 </Button>
-              </form>Home
+              </form>
+              Home
             </>
           ) : (
             <>
