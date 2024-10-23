@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { Button, TextField, Container, Paper, Typography, Stack, Avatar, IconButton } from "@mui/material";
-import { CameraAlt as CameraAltIcon } from "@mui/icons-material";
-import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
 import { useFileHandler, useInputValidation } from "6pp";
-import { usernameValidator } from "../utils/validators";
+import { CameraAlt as CameraAltIcon } from "@mui/icons-material";
+import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
 import AppLayout from "../components/layout/AppLayout";
+import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
+import { gradient } from "../constants/color";
+import { usernameValidator } from "../utils/validators";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,16 +21,14 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Logged in");
   };
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    console.log("Submit form");
   };
 
   return (
-    <div style={{ backgroundImage: "linear-gradient(rgb(255,255,209), rgba(249, 159, 159))" }}>
+    <div style={{ backgroundImage: gradient }}>
       <Container
         component={"main"}
         maxWidth="xs"

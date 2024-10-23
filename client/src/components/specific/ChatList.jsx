@@ -1,6 +1,7 @@
 import React from "react";
 import { Stack } from "@mui/material";
 import ChatItem from "../shared/ChatItem";
+import { gradient } from "../../constants/color";
 
 const ChatList = ({
   w = "100%",
@@ -19,6 +20,11 @@ const ChatList = ({
     <Stack
       width={w}
       direction={"column"}
+      overflow={"auto"}
+      height={"100%"}
+      sx={{
+        position: "relative",
+      }}
     >
       {chats?.map((data, index) => {
         const { avatar, name, _id, groupChat, members } = data;
