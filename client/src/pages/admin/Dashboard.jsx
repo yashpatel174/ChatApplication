@@ -1,6 +1,3 @@
-import React from "react";
-import AdminLayout from "../../components/layout/AdminLayout";
-import { Container, Paper, Stack, Typography, Box } from "@mui/material";
 import {
   AdminPanelSettings as AdminPanelSettingsIcon,
   Group as GroupIcon,
@@ -8,10 +5,13 @@ import {
   Notifications as NotificationsIcon,
   Person as PersonIcon,
 } from "@mui/icons-material";
+import { Box, Container, Paper, Stack, Typography } from "@mui/material";
 import moment from "moment";
+import React from "react";
+import AdminLayout from "../../components/layout/AdminLayout";
+import { DoughnutChart, LineChart } from "../../components/specific/Charts";
 import { CurvedButton, SearchField } from "../../components/styles/StyledComponents";
 import { matBlack } from "../../constants/color";
-import { DoughnutChart, LineChart } from "../../components/specific/Charts";
 
 const Dashboard = () => {
   const Appbar = (
@@ -80,9 +80,19 @@ const Dashboard = () => {
       <Container component={"main"}>
         {Appbar}
         <Stack
-          direction={"row"}
-          spacing={"2rem"}
+          direction={{
+            xs: "column",
+            lg: "row",
+          }}
+          sx={{
+            gap: "1rem",
+          }}
           flexWrap={"wrap"}
+          justifyContent={"center"}
+          alignItems={{
+            xs: "center",
+            lg: "stretch",
+          }}
         >
           <Paper
             elevation={3}
@@ -91,7 +101,6 @@ const Dashboard = () => {
               borderRadius: "1rem",
               width: "100%",
               maxWidth: "45rem",
-              height: "25rem",
             }}
           >
             <Typography
@@ -100,7 +109,7 @@ const Dashboard = () => {
             >
               Last Messages
             </Typography>
-            <LineChart />
+            <LineChart value={[23, 56, 89, 78, 45, 12]} />
           </Paper>
           <Paper
             elevation={3}
@@ -114,10 +123,12 @@ const Dashboard = () => {
               position: "relative",
               width: "100%",
               maxWidth: "25rem",
-              height: "25rem",
             }}
           >
-            <DoughnutChart />
+            <DoughnutChart
+              labels={["Single Chats", "Group Chats"]}
+              value={[23, 65]}
+            />
             <Stack
               position={"absolute"}
               direction={"row"}
