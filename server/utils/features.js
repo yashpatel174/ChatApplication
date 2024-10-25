@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import JWT from "jsonwebtoken";
+import { response } from "../middlewares/responses.js";
 
-const cookieOption = { maxAge: 15 * 24 * 60 * 60 * 1000, sameSight: "none", httpOnly: true, secure: true };
+export const cookieOptions = { maxAge: 15 * 24 * 60 * 60 * 1000, sameSight: "none", httpOnly: true, secure: true };
 
 export const database = (uri) => {
   try {
@@ -13,9 +14,9 @@ export const database = (uri) => {
 
 export const sendToken = (res, user, code, message) => {
   try {
-    const token = JWT.sign({ _id: user._id }, process.env.SECRET_KEY, { duration: process.env.EXPIRE });
+    const token = JWT.sign({ _id: user._id }, process.env.SECRET_KEY, { expiresIn: process.env.EXPIRE });
 
-    return res.status(code).cookie("token", token, cookieOption).send({
+    return res.status(code).cookie("token", token, cookieOptions).send({
       success: true,
       message: message,
       result: user,
@@ -24,3 +25,13 @@ export const sendToken = (res, user, code, message) => {
     res.send({ message: message, error: error.message });
   }
 };
+
+export const emitEvent = (req, event, user, data) => {
+  try {
+    console.log("Emit event", event);
+  } catch (error) {
+    response(res, "Error", 500, error.message);
+  }
+};
+
+export const deleteFilesFromCloudinary = async () => {};

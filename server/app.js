@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import userRoute from "./routes/userRoute.js";
 import { database } from "./utils/features.js";
 import cookieParser from "cookie-parser";
+
+import userRoute from "./routes/userRoute.js";
+import chatRoute from "./routes/chatRoute.js";
 
 const app = express();
 
@@ -17,6 +19,7 @@ app.use(cookieParser());
 
 // Routes
 app.use("/users", userRoute);
+app.use("/chats", chatRoute);
 
 database(process.env.DB);
 

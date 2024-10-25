@@ -1,10 +1,10 @@
-import { response } from "./responses";
+import { response } from "./responses.js";
 import JWT from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
   try {
     const token = req.cookies["token"];
-    if (!token) return response(res, "Invalid token!", 403);
+    if (!token) return response(res, "Please login to access this route!", 401);
 
     const decode = JWT.verify(token, process.env.SECRET_KEY);
     if (!decode) return response(res, "Token does not match");
@@ -19,4 +19,3 @@ const authMiddleware = (req, res, next) => {
 };
 
 export { authMiddleware };
-l;

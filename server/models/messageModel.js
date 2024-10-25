@@ -6,11 +6,11 @@ const messageSchema = new mongoose.Schema(
     attachments: [
       {
         public_id: {
-          type: stringify,
+          type: String,
           required: true,
         },
         url: {
-          type: stringify,
+          type: String,
           required: true,
         },
       },
