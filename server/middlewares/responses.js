@@ -24,4 +24,4 @@ const required = (res, ...fields) => {
   }
 };
 
-export { response, required };
+export { required, response };

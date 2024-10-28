@@ -1,10 +1,10 @@
-import { chatModel } from "../models/chatModel.js";
-import { userModel } from "../models/userModel.js";
-import { required, response } from "../middlewares/responses.js";
-import { emitEvent, deleteFilesFromCloudinary } from "../utils/features.js";
-import { alert, refetch_chats, new_attachment, new_message_alert } from "../constants/events.js";
+import { alert, new_attachment, new_message_alert, refetch_chats } from "../constants/events.js";
 import { otherMember } from "../lib/helper.js";
+import { required, response } from "../middlewares/responses.js";
+import { chatModel } from "../models/chatModel.js";
 import { messageModel } from "../models/messageModel.js";
+import { userModel } from "../models/userModel.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
 
 const groupChat = async (req, res) => {
   try {
@@ -152,14 +152,13 @@ const leaveGroup = async (req, res) => {
 const sendAttachment = async (req, res) => {
   try {
     const { chatId } = req.body;
-    required(res, { chatId });
+    const files = req.files || [];
+    if (!files || files.length < 1) return response(res, "Please upload attachments!", 400);
+    if (files.length > 5) return response(res, "Files can't be more than 5", 400);
 
     const [chat, me] = await Promise.all([chatModel.findById(chatId), userModel.findById(req.user, "name")]);
     if (!chat) return response(res, "Chat not found!", 404);
     if (!me) return response(res, "User not found!", 404);
-
-    const files = req.files || [];
-    if (!files || files.length < 1) return response(res, "Please provide attachments!", 400);
 
     //? Upload files here
     const attachments = [];
@@ -193,7 +192,8 @@ const getChatDetails = async (req, res) => {
       return response(res, "Data fetched successfully!", 200, chat);
     }
   } catch (error) {
-    response(res, "Error while getting chat information.", 500, error.message);
+    if (error.name === "CastError") return response(res, `Invalid format of ${error.path}`, 500);
+    response(res, "Error while getting chat information.", 500, process.env.NODE_ENV === "DEVELOPMENT" ? error : error.message);
   }
 };
 
@@ -244,4 +244,26 @@ const deleteChat = async (req, res) => {
   }
 };
 
-export { groupChat, myChat, myGroups, addMembers, removeMembers, leaveGroup, sendAttachment, getChatDetails, renameGroup, deleteChat };
+const getMessages = async (req, res) => {
+  try {
+    const chatId = req.params.id;
+    required(res, { chatId });
+
+    const { page = 1 } = req.query;
+    const resultPerPage = 20;
+    const skip = (page - 1) * resultPerPage;
+
+    const [messages, totalMessagesCount] = await Promise.all([
+      messageModel.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(resultPerPage).populate("sender", "name").lean(),
+      messageModel.countDocuments({ chat: chatId }),
+    ]);
+
+    const totalPages = Math.ceil(totalMessagesCount / resultPerPage) || 0;
+
+    response(res, "", 200, [messages.reverse(), totalPages]);
+  } catch (error) {
+    response(res, "Error while getting messages.", 500, error.message);
+  }
+};
+
+export { addMembers, deleteChat, getChatDetails, getMessages, groupChat, leaveGroup, myChat, myGroups, removeMembers, renameGroup, sendAttachment };
