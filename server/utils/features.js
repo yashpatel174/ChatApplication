@@ -33,7 +33,7 @@ export const emitEvent = (req, event, user, data) => {
   try {
     console.log("Emit event", event);
   } catch (error) {
-    response(res, "Error", 500, error.message);
+    console.log(error.message);
   }
 };
 
@@ -43,7 +43,7 @@ export const uploadFileCloudinary = async (files = []) => {
       cloudinary.uploader.upload(
         getBase64(file),
         {
-          resource_type: auto,
+          resource_type: "auto",
           public_id: uuid(),
         },
         (error, result) => {
@@ -55,13 +55,13 @@ export const uploadFileCloudinary = async (files = []) => {
   });
   try {
     const results = await Promise.all(uploadPromise);
-    const formattedResults = results?.map((result) => {
-      public_id: result.public_id;
-      url: result.secure_url;
-    });
+    const formattedResults = results?.map((result) => ({
+      public_id: result.public_id,
+      url: result.secure_url,
+    }));
     return formattedResults;
   } catch (error) {
-    response(res, "Error while uploading files to cloudinary", 500, error.message);
+    console.log("Error while uploading files to cloudinary", error.message);
   }
 };
 

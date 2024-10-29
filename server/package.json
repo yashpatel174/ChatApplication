@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "client": "npm run start --prefix ../client",
-    "server": "NODE_ENV=PRODUCTION && node app.js",
-    "dev": "NODE_ENV=DEVELOPMENT && nodemon app.js",
-    "start": "concurrently \"npm run server\" \"npm run client\""
+    "start": "NODE_ENV=PRODUCTION && nodemon app.js",
+    "devlopment": "NODE_ENV=DEVELOPMENT && nodemon app.js",
+    "pro": "concurrently \"npm run start\" \"npm run client\"",
+    "dev": "concurrently \"npm run devlopment\" \"npm run client\""
   },
   "keywords": [],
   "author": "",

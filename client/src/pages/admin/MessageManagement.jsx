@@ -28,8 +28,9 @@ const columns = [
               <Box>
                 <a
                   href={url}
-                  download
                   target="_blank"
+                  rel="noreferrer"
+                  download
                   style={{
                     color: "black",
                   }}

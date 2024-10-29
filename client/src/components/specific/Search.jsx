@@ -1,23 +1,47 @@
 import { useInputValidation } from "6pp";
-import { Dialog, DialogTitle, InputAdornment, List, ListItem, ListItemText, Stack, TextField } from "@mui/material";
-import React, { useState } from "react";
 import { Search as SearchIcon } from "@mui/icons-material";
+import { Dialog, DialogTitle, InputAdornment, List, Stack, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useAsyncMutation } from "../../hooks/hook";
+import { useLazyMyChatsQuery, useSendFriendRequestMutation } from "../../redux/api/api";
+import { setIsSearch } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
-import { sampleUsers } from "../../constants/sampleData";
 
 const Search = () => {
-  const [users, setUsers] = useState(sampleUsers);
+  const [users, setUsers] = useState([]);
+
+  const { isSearch } = useSelector((state) => state.misc);
+  const [searchUser] = useLazyMyChatsQuery();
+  const [sendFriendRequest, isLoadingSendFriendRequest] = useAsyncMutation(useSendFriendRequestMutation);
+
+  const dispatch = useDispatch();
 
   const search = useInputValidation("");
-  const isLoadingSendFriendRequest = false;
 
-  const addFriendHandler = (id) => {
-    console.log(id);
+  const addFriendHandler = async (id) => {
+    await sendFriendRequest("Sending friend request...", { userId: id });
   };
+
+  const searchCloseHandler = () => dispatch(setIsSearch(false));
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      searchUser(search.value)
+        .then(({ data }) => setUsers(data.result))
+        .catch((e) => console.log(e));
+    }, 10000);
+    return () => {
+      clearTimeout(timeOutId);
+    };
+  }, [search.value]);
 
   return (
     <>
-      <Dialog open>
+      <Dialog
+        open={isSearch}
+        onClose={searchCloseHandler}
+      >
         <Stack
           padding={"2rem"}
           direction={"column"}
@@ -31,7 +55,7 @@ const Search = () => {
             variant="outlined"
             size="small"
             InputProps={{
-              startAndornment: (
+              startAdornment: (
                 <InputAdornment position="start">
                   <SearchIcon />
                 </InputAdornment>

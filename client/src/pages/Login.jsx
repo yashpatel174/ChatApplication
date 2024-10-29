@@ -1,16 +1,16 @@
 import { useFileHandler, useInputValidation } from "6pp";
 import { CameraAlt as CameraAltIcon } from "@mui/icons-material";
 import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
+import axios from "axios";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import AppLayout from "../components/layout/AppLayout";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
 import { gradient } from "../constants/color";
-import { usernameValidator } from "../utils/validators";
-import axios from "axios";
 import { server } from "../constants/config";
-import { useDispatch } from "react-redux";
 import { userExists } from "../redux/reducers/auth";
-import toast from "react-hot-toast";
+import { usernameValidator } from "../utils/validators";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,8 +27,8 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const config = { withCredentials: true, headers: { "Content-Type": "application/json" } };
     try {
+      const config = { withCredentials: true, headers: { "Content-Type": "application/json" } };
       const { data } = await axios.post(`${server}/users/login`, { userName: userName.value, password: password.value }, config);
       dispatch(userExists(true));
       toast.success(data.message);
@@ -55,7 +55,9 @@ const Login = () => {
       const { data } = await axios.post(`${server}/users/register`, formData, config);
       dispatch(userExists(true));
       toast.success(data.message);
-    } catch (error) {}
+    } catch (error) {
+      toast.error(error?.response?.data?.messge || "Something Went Wrong!");
+    }
   };
 
   return (

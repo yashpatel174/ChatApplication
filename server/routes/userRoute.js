@@ -10,7 +10,7 @@ router.post("/login", login);
 
 router.use(authMiddleware);
 router.get("/profile", userProfile);
-router.post("/logout", logout);
+router.get("/logout", logout);
 router.get("/search", searchUser);
 router.put("/sendRequest", sendRequest);
 router.put("/acceptRequest", acceptRequest);

@@ -13,12 +13,11 @@ const register = async (req, res) => {
     const { name, userName, password, bio } = req.body;
     const file = req.file;
     required(res, { file }, { name }, { userName }, { password }, { bio });
-
     const result = await uploadFileCloudinary([file]);
 
     const avatar = {
-      public_id: result[0].public_id,
-      url: result[0].secure_url,
+      public_id: result[0]?.public_id,
+      url: result[0]?.url,
     };
 
     const existingUser = await userModel.findOne({ userName });
@@ -31,7 +30,6 @@ const register = async (req, res) => {
     response(res, "User registered successfully!", 200, user);
   } catch (error) {
     console.log(error.message);
-
     if (error.code === 11000) {
       const err = Object.keys(error.keyPattern).join(",");
       response(res, `Duplicate field -${err}`, 500);
