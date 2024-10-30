@@ -1,5 +1,4 @@
 import { userSocketId } from "../app.js";
-import { response } from "../middlewares/responses.js";
 
 export const otherMember = (members, userId) => {
   return members.find((m) => m._id.toString() !== userId.toString());
@@ -7,7 +6,7 @@ export const otherMember = (members, userId) => {
 
 export const getSockets = async (users = []) => {
   try {
-    return users?.map((user) => userSocketId.get(user._id.toString()));
+    return users?.map((user) => userSocketId.get(user.toString()));
   } catch (error) {
     console.log(error.message);
   }

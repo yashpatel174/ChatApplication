@@ -4,7 +4,7 @@ import { server } from "../../constants/config";
 const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: `${server}` }),
-  tagTypes: ["Chat", "User"],
+  tagTypes: ["Chat", "User", "Message"],
 
   endpoints: (builder) => ({
     myChats: builder.query({
@@ -46,8 +46,44 @@ const api = createApi({
       }),
       invalidatesTags: ["Chat"],
     }),
+    chatDetails: builder.query({
+      query: ({ chatId, populate = false }) => {
+        let url = `/chats/${chatId}`;
+        if (populate) url += `?populate=true`;
+        return {
+          url: url,
+          credentials: "include",
+        };
+      },
+      providesTags: ["Chat"],
+    }),
+    getMessages: builder.query({
+      query: ({ chatId, page }) => ({
+        url: `/message/${chatId}?page=${page}`,
+        credentials: "include",
+      }),
+      providesTags: ["Message"],
+    }),
+    sendAttachments: builder.mutation({
+      query: (data) => ({
+        url: `/chats/message`,
+        method: "POST",
+        credentials: "include",
+        body: data,
+      }),
+    }),
   }),
 });
 
 export default api;
-export const { useMyChatsQuery, useLazyMyChatsQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation } = api;
+export const {
+  useMyChatsQuery,
+  useLazySearchUserQuery,
+  useLazyMyChatsQuery,
+  useSendFriendRequestMutation,
+  useGetNotificationQuery,
+  useAcceptFriendRequestMutation,
+  useChatDetailsQuery,
+  useGetMessagesQuery,
+  useSendAttachmentsMutation,
+} = api;

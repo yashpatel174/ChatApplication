@@ -16,7 +16,6 @@ const NewGroup = lazy(() => import("../specific/NewGroup"));
 
 const Header = () => {
   const [isNewGroup, setIsNewGroup] = useState(false);
-
   const { isSearch, isNotification } = useSelector((state) => state.misc);
 
   const navigate = useNavigate();

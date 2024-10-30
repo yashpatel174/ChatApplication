@@ -1,10 +1,10 @@
-import { alert, new_attachment, new_message_alert, refetch_chats } from "../constants/events.js";
+import { alert, new_message, new_message_alert, refetch_chats } from "../constants/events.js";
 import { otherMember } from "../lib/helper.js";
 import { required, response } from "../middlewares/responses.js";
 import { chatModel } from "../models/chatModel.js";
 import { messageModel } from "../models/messageModel.js";
 import { userModel } from "../models/userModel.js";
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
+import { deleteFilesFromCloudinary, emitEvent, uploadFileCloudinary } from "../utils/features.js";
 
 const groupChat = async (req, res) => {
   try {
@@ -161,13 +161,13 @@ const sendAttachment = async (req, res) => {
     if (!me) return response(res, "User not found!", 404);
 
     //? Upload files here
-    const attachments = [];
+    const attachments = await uploadFileCloudinary(files);
 
     const messageForDb = { content: "", attachments, sender: me._id, chat: chatId };
     const messageForRealTime = { ...messageForDb, sender: { _id: me._id, name: me.name } };
     const message = new messageModel(messageForDb);
     await message.save();
-    emitEvent(req, new_attachment, chat.members, {
+    emitEvent(req, new_message, chat.members, {
       message: messageForRealTime,
       chatId,
     });

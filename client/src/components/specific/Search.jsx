@@ -4,19 +4,18 @@ import { Dialog, DialogTitle, InputAdornment, List, Stack, TextField } from "@mu
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useAsyncMutation } from "../../hooks/hook";
-import { useLazyMyChatsQuery, useSendFriendRequestMutation } from "../../redux/api/api";
+import { useLazyMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation } from "../../redux/api/api";
 import { setIsSearch } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
 
 const Search = () => {
   const [users, setUsers] = useState([]);
-
   const { isSearch } = useSelector((state) => state.misc);
+  // const [searchUser] = useLazySearchUserQuery();
   const [searchUser] = useLazyMyChatsQuery();
   const [sendFriendRequest, isLoadingSendFriendRequest] = useAsyncMutation(useSendFriendRequestMutation);
 
   const dispatch = useDispatch();
-
   const search = useInputValidation("");
 
   const addFriendHandler = async (id) => {
@@ -28,7 +27,7 @@ const Search = () => {
   useEffect(() => {
     const timeOutId = setTimeout(() => {
       searchUser(search.value)
-        .then(({ data }) => setUsers(data.result))
+        .then(({ data }) => setUsers(data?.result))
         .catch((e) => console.log(e));
     }, 10000);
     return () => {

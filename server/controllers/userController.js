@@ -81,15 +81,17 @@ const userProfile = async (req, res) => {
 const searchUser = async (req, res) => {
   try {
     const { name = "" } = req.query;
-    required(res, { name });
 
-    const myChats = await chatModel.find({ groupChat: false, members: req.user });
-    //* People I have chatted with
-    const allUsersFromChat = myChats?.flatMap((c) => c.members);
-    //*
+    // Fetch all individual (non-group) chats where the current user is a member
+    const myChats = await chatModel.find({ groupChat: false, members: req.user._id });
+
+    // Extract all members from these chats, excluding the current user
+    const allUsersFromChat = myChats.flatMap((c) => c.members).filter((id) => !id.equals(req.user._id));
+
+    // Query to get all other users who are not in `allUsersFromChat`
     const allOtherUsers = await userModel.find({
-      _id: { $nin: allUsersFromChat },
-      name: { $regex: name, $options: "i" },
+      _id: { $nin: allUsersFromChat.concat(req.user._id) }, // Exclude users in chat history and current user
+      name: { $regex: name, $options: "i" }, // Match users by name
     });
 
     const users = allOtherUsers?.map(({ _id, name, avatar }) => ({ _id, name, avatar: avatar.url }));

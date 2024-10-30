@@ -6,18 +6,21 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { v4 as uuid } from "uuid";
 import { database } from "./utils/features.js";
-
+import { v2 as cloudinary } from "cloudinary";
+import { corsOptions } from "./constants/config.js";
 import { new_message, new_message_alert } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
+import { socketAuth } from "./middlewares/auth.js";
 import { messageModel } from "./models/messageModel.js";
+
 import adminRoute from "./routes/adminRoute.js";
 import chatRoute from "./routes/chatRoute.js";
 import userRoute from "./routes/userRoute.js";
-import { v2 as cloudinary } from "cloudinary";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, { cors: corsOptions });
+app.set("io", io);
 export const userSocketId = new Map();
 
 // Env configureation
@@ -26,12 +29,7 @@ dotenv.config();
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: [process.env.FRONTEND],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
 // SecretKey
 export const adminKey = process.env.ADMIN_KEY || "laushmcfoq";
@@ -41,13 +39,12 @@ app.use("/api/v1/users", userRoute);
 app.use("/api/v1/chats", chatRoute);
 app.use("/api/v1/admin", adminRoute);
 
-io.use((socket, next) => {});
+io.use((socket, next) => {
+  cookieParser(socket.request, socket.request.res, async (err) => await socketAuth(err, socket, next));
+});
 
 io.on("connection", (socket) => {
-  const user = {
-    _id: "12345",
-    name: "Yash",
-  };
+  const user = socket.user;
   userSocketId.set(user._id.toString(), socket.id);
   console.log(userSocketId);
   socket.on(new_message, async ({ chatId, members, message }) => {

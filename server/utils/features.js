@@ -3,7 +3,7 @@ import JWT from "jsonwebtoken";
 import { response } from "../middlewares/responses.js";
 import { v4 as uuid } from "uuid";
 import { v2 as cloudinary } from "cloudinary";
-import { getBase64 } from "../lib/helper.js";
+import { getBase64, getSockets } from "../lib/helper.js";
 
 export const cookieOptions = { maxAge: 15 * 24 * 60 * 60 * 1000, sameSight: "none", httpOnly: true, secure: true };
 
@@ -31,7 +31,9 @@ export const sendToken = (res, user, code, message) => {
 
 export const emitEvent = (req, event, user, data) => {
   try {
-    console.log("Emit event", event);
+    const io = req.app.get("io");
+    const userSocket = getSockets(user);
+    io.to(userSocket).emit(event, data);
   } catch (error) {
     console.log(error.message);
   }
