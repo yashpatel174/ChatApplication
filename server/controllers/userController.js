@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { new_request } from "../constants/events.js";
+import { new_request, refetch_chats } from "../constants/events.js";
 import { otherMember } from "../lib/helper.js";
 import { required, response } from "../middlewares/responses.js";
 import { chatModel } from "../models/chatModel.js";
@@ -133,7 +133,7 @@ const sendRequest = async (req, res) => {
 const acceptRequest = async (req, res) => {
   try {
     const { requestId, accept } = req.body;
-    required(res, { request }, { accept });
+    required(res, { requestId }, { accept });
 
     const request = await requestModel.findById(requestId).populate("sender", "name").populate("receiver", "name");
     if (!request) response(res, "Request not found", 404);
@@ -147,10 +147,10 @@ const acceptRequest = async (req, res) => {
 
     const members = [request.sender._id, request.receiver._id];
     await Promise.all([
-      new chatModel({
+      chatModel.create({
+        name: `${request.sender.name}-${request.receiver.name}`,
         members,
-        name: `${req.sender.name}-${request.receiver.name}`,
-      }).save(),
+      }),
       request.deleteOne(),
     ]);
 
@@ -164,7 +164,7 @@ const acceptRequest = async (req, res) => {
 //* Notifications
 const notifications = async (req, res) => {
   try {
-    const request = await requestModel.findOne({ receiver: req.user }).populate("sender", "name avatar");
+    const request = await requestModel.find({ receiver: req.user }).populate("sender", "name avatar");
     if (!request) return response(res, "Request not found", 404);
 
     const allRequest = request?.map(({ _id, sender }) => ({
@@ -207,6 +207,8 @@ const getFriends = async (req, res) => {
       return response(res, "", 200, friends);
     }
   } catch (error) {
+    console.log(error.message);
+
     response(res, "Error while getting friends", 500, error.message);
   }
 };

@@ -17,14 +17,14 @@ import adminRoute from "./routes/adminRoute.js";
 import chatRoute from "./routes/chatRoute.js";
 import userRoute from "./routes/userRoute.js";
 
+// Env configureation
+dotenv.config();
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: corsOptions });
 app.set("io", io);
 export const userSocketId = new Map();
-
-// Env configureation
-dotenv.config();
 
 // Middlewares
 app.use(express.json());
@@ -40,13 +40,12 @@ app.use("/api/v1/chats", chatRoute);
 app.use("/api/v1/admin", adminRoute);
 
 io.use((socket, next) => {
-  cookieParser(socket.request, socket.request.res, async (err) => await socketAuth(err, socket, next));
+  cookieParser()(socket.request, socket.request.res, async (err) => await socketAuth(err, socket, next));
 });
 
 io.on("connection", (socket) => {
   const user = socket.user;
   userSocketId.set(user._id.toString(), socket.id);
-  console.log(userSocketId);
   socket.on(new_message, async ({ chatId, members, message }) => {
     const messageForRealtime = { content: message, _id: uuid(), sender: { _id: user._id, name: user.name }, chat: chatId, createdAt: new Date().toISOString() };
     const dbMessage = { content: message, sender: user._id, chat: chatId };

@@ -40,10 +40,12 @@ const useAsyncMutation = (mutationHook) => {
 
 const useSocketEvents = (socket, handlers) => {
   useEffect(() => {
+    if (!socket) return;
     Object.entries(handlers).forEach(([event, handler]) => {
       socket.on(event, handler);
     });
     return () => {
+      if (!socket) return;
       Object.entries(handlers).forEach(([event, handler]) => {
         socket.off(event, handler);
       });

@@ -26,7 +26,7 @@ const MessageComponent = ({ message, user }) => {
           fontWeight={"600"}
           variant="caption"
         >
-          {sender.name}
+          {sender?.name}
         </Typography>
       )}
       {content && <Typography>{content}</Typography>}

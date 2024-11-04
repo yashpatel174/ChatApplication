@@ -11,6 +11,7 @@ import Profile from "../specific/Profile";
 import Header from "./Header";
 import { useSocket } from "../../Socket";
 import { new_message_alert, new_request } from "../../constants/events";
+import { incrementNotification } from "../../redux/reducers/chat";
 
 const AppLayout = () => (WrappedComponent) => {
   return (props) => {
@@ -33,8 +34,12 @@ const AppLayout = () => (WrappedComponent) => {
     };
 
     const handleMobileClose = () => dispatch(setIsMobile(false));
-    const newMsgAlertHandler = useCallback(() => {}, []);
-    const newReqHandler = useCallback(() => {}, []);
+    const newMsgAlertHandler = useCallback((data) => {
+      console.log(data.chatId);
+    }, []);
+    const newReqHandler = useCallback(() => {
+      dispatch(incrementNotification());
+    }, [dispatch]);
 
     const eventHandlers = {
       [new_message_alert]: newMsgAlertHandler,
@@ -109,8 +114,6 @@ const AppLayout = () => (WrappedComponent) => {
             <Profile user={user} />
           </Grid>
         </Grid>
-
-        <h1>Footer</h1>
       </>
     );
   };

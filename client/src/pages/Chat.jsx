@@ -1,7 +1,8 @@
 import { useInfiniteScrollTop } from "6pp";
 import { AttachFile as AttachFileIcon, Send as SendIcon } from "@mui/icons-material";
 import { IconButton, Skeleton, Stack } from "@mui/material";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import FileMenu from "../components/dialogs/FileMenu";
 import AppLayout from "../components/layout/AppLayout";
 import MessageComponent from "../components/shared/MessageComponent";
@@ -10,9 +11,8 @@ import { grayColor, orange } from "../constants/color";
 import { new_message } from "../constants/events";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
-import { useSocket } from "../Socket";
-import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
+import { useSocket } from "../Socket";
 
 const Chat = ({ chatId, user }) => {
   const [message, setMessage] = useState("");
@@ -23,12 +23,15 @@ const Chat = ({ chatId, user }) => {
   const containerRef = useRef(null);
   const socket = useSocket();
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
+
   const oldMessages = useGetMessagesQuery({ chatId, page });
+  console.log(oldMessages, "oldMessages");
+
   const dispatch = useDispatch();
 
-  const { data: oldMsgs, setData: setOldMsgs } = useInfiniteScrollTop(containerRef, oldMessages?.data?.result?.totalPages, page, setPage, oldMessages.data?.result?.messages);
+  const { data: oldMsgs, setData: setOldMsgs } = useInfiniteScrollTop(containerRef, oldMessages?.data?.result[1], page, setPage, oldMessages.data?.result[0]);
 
-  const members = chatDetails?.data?.result.members;
+  const members = chatDetails?.data?.result?.members;
   const errors = [
     { isError: chatDetails.isError, error: chatDetails.error },
     { isError: oldMessages.isError, error: oldMessages.error },
@@ -46,13 +49,23 @@ const Chat = ({ chatId, user }) => {
     setMessage("");
   };
 
-  const newMessagesHandler = useCallback((data) => {
-    setMessages((prev) => [...prev, data?.result?.message]);
-  }, []);
+  useEffect(() => {
+    return () => {
+      setMessages([]);
+      setMessage("");
+      setOldMsgs([]);
+      setPage(1);
+    };
+  }, [chatId]);
 
-  const newMessageAlert = useCallback((data) => {
-    console.log(data);
-  }, []);
+  const newMessagesHandler = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      console.log(data, "new messages");
+      setMessages((prev) => [...prev[0], data?.result]);
+    },
+    [chatId]
+  );
 
   const eventHandler = { [new_message]: newMessagesHandler };
   useSocketEvents(socket, eventHandler);
@@ -60,7 +73,6 @@ const Chat = ({ chatId, user }) => {
   useErrors(errors);
 
   const allMessages = [...oldMsgs, ...messages];
-
   return chatDetails.isLoading ? (
     <Skeleton />
   ) : (
@@ -129,7 +141,7 @@ const Chat = ({ chatId, user }) => {
         </Stack>
       </form>
       <FileMenu
-        anchorE1={fileMenuAnchor}
+        anchorEl={fileMenuAnchor}
         chatId={chatId}
       />
     </>

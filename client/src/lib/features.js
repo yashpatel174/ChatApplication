@@ -13,7 +13,7 @@ const fileFormat = (url = "") => {
 };
 
 const transformImage = (url = "", width = 100) => {
-  const newUrl = url.replace("upload/", `upload/dpr_auto/w_${width}/`);
+  const newUrl = typeof url === "string" ? url.replace("upload/", `upload/dpr_auto/w_${width}/`) : url;
   return newUrl;
 };
 

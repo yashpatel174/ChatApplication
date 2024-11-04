@@ -6,7 +6,7 @@ import { AudioFile as AudioFileIcon, Image as ImageIcon, UploadFile as UploadFil
 import toast from "react-hot-toast";
 import { useSendAttachmentsMutation } from "../../redux/api/api";
 
-const FileMenu = ({ anchorE1, chatId }) => {
+const FileMenu = ({ anchorEl, chatId }) => {
   const { isFileMenu } = useSelector((state) => state.misc);
   const dispatch = useDispatch();
   const imageRef = useRef(null);
@@ -46,7 +46,7 @@ const FileMenu = ({ anchorE1, chatId }) => {
   return (
     <>
       <Menu
-        anchorE1={anchorE1}
+        anchorEl={anchorEl}
         open={isFileMenu}
         onClose={closeHandler}
       >
@@ -75,7 +75,7 @@ const FileMenu = ({ anchorE1, chatId }) => {
               <input
                 type="file"
                 multiple
-                accept="audio/mpeg, audio/wave"
+                accept="audio/mpeg, audio/wav"
                 style={{ display: "none" }}
                 onChange={(e) => fileChangeHandler(e, "Audios")}
                 ref={audioRef}

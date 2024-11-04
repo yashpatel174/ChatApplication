@@ -29,10 +29,10 @@ export const sendToken = (res, user, code, message) => {
   }
 };
 
-export const emitEvent = (req, event, user, data) => {
+export const emitEvent = (req, event, users, data) => {
   try {
     const io = req.app.get("io");
-    const userSocket = getSockets(user);
+    const userSocket = getSockets(users);
     io.to(userSocket).emit(event, data);
   } catch (error) {
     console.log(error.message);

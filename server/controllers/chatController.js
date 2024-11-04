@@ -166,6 +166,7 @@ const sendAttachment = async (req, res) => {
     const messageForDb = { content: "", attachments, sender: me._id, chat: chatId };
     const messageForRealTime = { ...messageForDb, sender: { _id: me._id, name: me.name } };
     const message = new messageModel(messageForDb);
+    console.log(message, "created message");
     await message.save();
     emitEvent(req, new_message, chat.members, {
       message: messageForRealTime,
@@ -192,7 +193,7 @@ const getChatDetails = async (req, res) => {
       return response(res, "Data fetched successfully!", 200, chat);
     }
   } catch (error) {
-    if (error.name === "CastError") return response(res, `Invalid format of ${error.path}`, 500);
+    if (error.name === "CastError") return response(res, `Invalid format of ${error?.path}`, 500);
     response(res, "Error while getting chat information.", 500, process.env.NODE_ENV === "DEVELOPMENT" ? error : error.message);
   }
 };
@@ -262,6 +263,7 @@ const getMessages = async (req, res) => {
 
     response(res, "", 200, [messages.reverse(), totalPages]);
   } catch (error) {
+    console.log(error.message, "backend error");
     response(res, "Error while getting messages.", 500, error.message);
   }
 };

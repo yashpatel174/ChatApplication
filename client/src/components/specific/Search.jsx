@@ -11,8 +11,8 @@ import UserItem from "../shared/UserItem";
 const Search = () => {
   const [users, setUsers] = useState([]);
   const { isSearch } = useSelector((state) => state.misc);
-  // const [searchUser] = useLazySearchUserQuery();
-  const [searchUser] = useLazyMyChatsQuery();
+  const [searchUser] = useLazySearchUserQuery();
+  // const [searchUser] = useLazyMyChatsQuery();
   const [sendFriendRequest, isLoadingSendFriendRequest] = useAsyncMutation(useSendFriendRequestMutation);
 
   const dispatch = useDispatch();

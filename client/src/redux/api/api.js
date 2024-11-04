@@ -51,7 +51,7 @@ const api = createApi({
         let url = `/chats/${chatId}`;
         if (populate) url += `?populate=true`;
         return {
-          url: url,
+          url,
           credentials: "include",
         };
       },
@@ -59,10 +59,10 @@ const api = createApi({
     }),
     getMessages: builder.query({
       query: ({ chatId, page }) => ({
-        url: `/message/${chatId}?page=${page}`,
+        url: `/chats/message/${chatId}?page=${page}`,
         credentials: "include",
       }),
-      providesTags: ["Message"],
+      keepUnusedDataFor: 0,
     }),
     sendAttachments: builder.mutation({
       query: (data) => ({
