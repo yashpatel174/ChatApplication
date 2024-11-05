@@ -63,7 +63,6 @@ const myGroups = async (req, res) => {
       name,
       avatar: members.slice(0, 3)?.map(({ avatar }) => avatar.url),
     }));
-
     response(res, "", 200, groups);
   } catch (error) {
     response(res, "Error while getting groups", 500, error.message);
@@ -108,13 +107,13 @@ const removeMembers = async (req, res) => {
     if (!chat.groupChat) return response(res, "This is not a group chat!", 400);
     if (chat.creator.toString() !== req.user.toString()) return response(res, "You are not allowed to add members", 403);
     if (chat.members.length <= 3) return response(res, "Group must have at least 3 members.", 400);
-
+    const allChatMembers = chat.members?.map((i) => i.toString());
     chat.members = chat.members?.filter((member) => member.toString() !== userId.toString());
 
     await chat.save();
 
     emitEvent(req, alert, chat.members, `${removedUser.name} has been removed from the group!`);
-    emitEvent(res, refetch_chats, chat.members);
+    emitEvent(res, refetch_chats, allChatMembers);
 
     response(res, "Member removed successfully!", 200);
   } catch (error) {
@@ -253,6 +252,13 @@ const getMessages = async (req, res) => {
     const { page = 1 } = req.query;
     const resultPerPage = 20;
     const skip = (page - 1) * resultPerPage;
+
+    const chat = await chatModel.findById(chatId);
+    if (!chat) response(res, "Chat not found", 404);
+
+    if (!chat.members?.includes(req.user.toString())) {
+      return response(res, "you are not allowed to access this chat", 403);
+    }
 
     const [messages, totalMessagesCount] = await Promise.all([
       messageModel.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(resultPerPage).populate("sender", "name").lean(),

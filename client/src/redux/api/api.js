@@ -72,6 +72,68 @@ const api = createApi({
         body: data,
       }),
     }),
+    availableFriends: builder.query({
+      query: (chatId) => {
+        let url = `/users/friends`;
+        if (chatId) url += `?chatId=${chatId}`;
+        return {
+          url,
+          credentials: "include",
+        };
+      },
+      providesTags: ["Chat"],
+    }),
+    myGroups: builder.query({
+      query: () => ({
+        url: "/chats/myGroup",
+        credentials: "include",
+      }),
+      providesTags: ["Chat"],
+    }),
+    newGroup: builder.mutation({
+      query: ({ name, members }) => ({
+        url: `/chats/group`,
+        method: "POST",
+        credentials: "include",
+        body: { name, members },
+      }),
+      invalidatesTags: ["Chat"],
+    }),
+    renameGroup: builder.mutation({
+      query: ({ chatId, name }) => ({
+        url: `/chats/${chatId}`,
+        method: "PUT",
+        credentials: "include",
+        body: { name },
+      }),
+      invalidatesTags: ["Chat"],
+    }),
+    removeGroupMember: builder.mutation({
+      query: ({ chatId, userId }) => ({
+        url: `/chats/removeMembers`,
+        method: "PUT",
+        credentials: "include",
+        body: { chatId, userId },
+      }),
+      invalidatesTags: ["Chat"],
+    }),
+    addGroupMember: builder.mutation({
+      query: ({ chatId, members }) => ({
+        url: `/chats/addMembers`,
+        method: "PUT",
+        credentials: "include",
+        body: { chatId, members },
+      }),
+      invalidatesTags: ["Chat"],
+    }),
+    deleteChat: builder.mutation({
+      query: (chatId) => ({
+        url: `/chats/${chatId}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Chat"],
+    }),
   }),
 });
 
@@ -86,4 +148,11 @@ export const {
   useChatDetailsQuery,
   useGetMessagesQuery,
   useSendAttachmentsMutation,
+  useMyGroupsQuery,
+  useAvailableFriendsQuery,
+  useNewGroupMutation,
+  useRenameGroupMutation,
+  useRemoveGroupMemberMutation,
+  useAddGroupMemberMutation,
+  useDeleteChatMutation,
 } = api;

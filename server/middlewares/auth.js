@@ -43,17 +43,17 @@ const socketAuth = async (err, socket, next) => {
     if (err) return next(err);
 
     const authToken = socket.request.cookies[cookieToken];
-    if (!authToken) return response(res, "Please login to access this route.", 401);
+    if (!authToken) return console.log("Please login to access this route.");
 
     const decode = JWT.verify(authToken, process.env.SECRET_KEY);
 
     const user = await userModel.findById(decode._id);
-    if (!user) return response(res, "User not found", 404);
+    if (!user) return console.log("User not found.");
 
     socket.user = user;
     return next();
   } catch (error) {
-    return response(res, "Please login to access this route.", 401, error.message);
+    console.log(error.message);
   }
 };
 

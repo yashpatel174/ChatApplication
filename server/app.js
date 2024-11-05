@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 import { database } from "./utils/features.js";
 import { v2 as cloudinary } from "cloudinary";
 import { corsOptions } from "./constants/config.js";
-import { new_message, new_message_alert } from "./constants/events.js";
+import { new_message, new_message_alert, start_typing, stop_typing } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { socketAuth } from "./middlewares/auth.js";
 import { messageModel } from "./models/messageModel.js";
@@ -47,7 +47,16 @@ io.on("connection", (socket) => {
   const user = socket.user;
   userSocketId.set(user._id.toString(), socket.id);
   socket.on(new_message, async ({ chatId, members, message }) => {
-    const messageForRealtime = { content: message, _id: uuid(), sender: { _id: user._id, name: user.name }, chat: chatId, createdAt: new Date().toISOString() };
+    const messageForRealtime = {
+      content: message,
+      _id: uuid(),
+      sender: {
+        _id: user._id,
+        name: user.name,
+      },
+      chat: chatId,
+      createdAt: new Date().toISOString(),
+    };
     const dbMessage = { content: message, sender: user._id, chat: chatId };
     const membersSocket = getSockets(members);
     io.to(membersSocket).emit(new_message, {
@@ -61,6 +70,16 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.log(error.message);
     }
+  });
+
+  socket.on(start_typing, ({ members, chatId }) => {
+    const membersSocket = getSockets(members);
+    socket.to(membersSocket).emit(start_typing, { chatId });
+  });
+
+  socket.on(stop_typing, ({ members, chatId }) => {
+    const membersSocket = getSockets(members);
+    socket.to(membersSocket).emit(stop_typing, { chatId });
   });
 
   socket.on("disconnect", () => {

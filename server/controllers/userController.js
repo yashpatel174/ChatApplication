@@ -185,12 +185,11 @@ const notifications = async (req, res) => {
 const getFriends = async (req, res) => {
   try {
     const chatId = req.query.chatId;
-    required(res, { chatId });
 
-    const chat = await chatModel.find({ members: req.user, groupChat: false }).popular("members", "name avatar");
+    const chats = await chatModel.find({ members: req.user, groupChat: false }).populate("members", "name avatar");
 
-    const friends = chat?.map(({ members }) => {
-      const otherUser = otherMember(members, req.user);
+    const friends = chats.map((chat) => {
+      const otherUser = otherMember(chat.members, req.user);
       return {
         _id: otherUser._id,
         name: otherUser.name,
@@ -199,17 +198,16 @@ const getFriends = async (req, res) => {
     });
 
     if (chatId) {
-      const chat = await chatModel.findById(chatId);
+      const chat = await chatModel.findById(chatId).populate("members", "name avatar");
       if (!chat) return response(res, "Chat not found", 404);
       const availableFriends = friends.filter((friend) => !chat.members?.includes(friend._id));
-      return response(res, "", 200, availableFriends);
+      return response(res, "Friends", 200, availableFriends);
     } else {
       return response(res, "", 200, friends);
     }
   } catch (error) {
     console.log(error.message);
-
-    response(res, "Error while getting friends", 500, error.message);
+    response(res, "", 500, error.message);
   }
 };
 

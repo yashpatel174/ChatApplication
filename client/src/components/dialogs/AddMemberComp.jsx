@@ -1,26 +1,38 @@
-import { Button, Dialog, DialogTitle, Stack, Typography } from "@mui/material";
+import { Button, Dialog, DialogTitle, Skeleton, Stack, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { sampleUsers } from "../../constants/sampleData";
+import { useDispatch, useSelector } from "react-redux";
+import { useAsyncMutation, useErrors } from "../../hooks/hook";
+import { useAddGroupMemberMutation, useAvailableFriendsQuery } from "../../redux/api/api";
+import { setIsAddMember } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
 
-const AddMemberComp = ({ addMember, isLoadingAddMember, chatId }) => {
-  const [members, setMembers] = useState(sampleUsers);
+const AddMemberComp = ({ chatId }) => {
+  const dispatch = useDispatch();
   const [selectedMembers, setSelectedMembers] = useState([]);
+
+  const { isAddMember } = useSelector((state) => state.misc);
+
+  const [addMember, isLoadingAddMember] = useAsyncMutation(useAddGroupMemberMutation);
+  const { isLoading, data, isError, error } = useAvailableFriendsQuery(chatId);
 
   const selectMemberHandler = (id) => {
     setSelectedMembers((prev) => (prev?.includes(id) ? prev.filter((currentElement) => currentElement !== id) : [...prev, id]));
   };
+
   const addMemberSubmitHandler = () => {
+    addMember("Adding Members...", { members: selectedMembers, chatId });
     closeHandler();
   };
+
   const closeHandler = () => {
-    setSelectedMembers([]);
-    setMembers([]);
+    dispatch(setIsAddMember(false));
   };
+
+  useErrors([{ isError, error }]);
   return (
     <>
       <Dialog
-        open
+        open={isAddMember}
         onClose={closeHandler}
       >
         <Stack
@@ -30,8 +42,10 @@ const AddMemberComp = ({ addMember, isLoadingAddMember, chatId }) => {
         >
           <DialogTitle textAlign={"center"}>Add Member</DialogTitle>
           <Stack spacing={"1rem"}>
-            {members.length > 0 ? (
-              members?.map((i) => (
+            {isLoading ? (
+              <Skeleton />
+            ) : data.result.length > 0 ? (
+              data.result?.map((i) => (
                 <UserItem
                   key={i._id}
                   user={i}
