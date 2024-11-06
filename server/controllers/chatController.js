@@ -112,7 +112,7 @@ const removeMembers = async (req, res) => {
 
     await chat.save();
 
-    emitEvent(req, alert, chat.members, `${removedUser.name} has been removed from the group!`);
+    emitEvent(req, alert, chat.members, { message: `${removedUser.name} has been removed from the group!`, chatId });
     emitEvent(res, refetch_chats, allChatMembers);
 
     response(res, "Member removed successfully!", 200);
@@ -141,8 +141,8 @@ const leaveGroup = async (req, res) => {
     chat.members = remainingMember;
     const [user] = await Promise.all([userModel.findById(req.user, "name"), chat.save()]);
 
-    emitEvent(req, alert, chat.members, `User ${user.name} has left the group.`);
-    response(res, "Group deleted successfully!", 200);
+    emitEvent(req, alert, chat.members, { message: `User ${user.name} has left the group.`, chatId });
+    response(res, "Group left successfully!", 200);
   } catch (error) {
     response(res, "Error while leaving group", 500, error.message);
   }
@@ -165,7 +165,6 @@ const sendAttachment = async (req, res) => {
     const messageForDb = { content: "", attachments, sender: me._id, chat: chatId };
     const messageForRealTime = { ...messageForDb, sender: { _id: me._id, name: me.name } };
     const message = new messageModel(messageForDb);
-    console.log(message, "created message");
     await message.save();
     emitEvent(req, new_message, chat.members, {
       message: messageForRealTime,

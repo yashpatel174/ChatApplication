@@ -18,6 +18,7 @@ const NewGroup = lazy(() => import("../specific/NewGroup"));
 const Header = () => {
   const { isSearch, isNotification, isNewGroup } = useSelector((state) => state.misc);
   const { notificationCount } = useSelector((state) => state.chat);
+  console.log(notificationCount, "notificationCount");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -123,6 +124,8 @@ const Header = () => {
 };
 
 const IconBtn = ({ title, icon, onClick, value }) => {
+  console.log(value, "value");
+
   return (
     <Tooltip title={title}>
       <IconButton

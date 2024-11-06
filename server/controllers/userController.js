@@ -139,7 +139,6 @@ const acceptRequest = async (req, res) => {
     if (!request) response(res, "Request not found", 404);
 
     if (request.receiver._id.toString() !== req.user.toString()) return response(res, "You are not authorized to accept this request", 401);
-
     if (!accept) {
       await request.deleteOne();
       return response(res, "Friend Request Rejected", 200);
@@ -148,8 +147,8 @@ const acceptRequest = async (req, res) => {
     const members = [request.sender._id, request.receiver._id];
     await Promise.all([
       chatModel.create({
-        name: `${request.sender.name}-${request.receiver.name}`,
         members,
+        name: `${request.sender.name}-${request.receiver.name}`,
       }),
       request.deleteOne(),
     ]);

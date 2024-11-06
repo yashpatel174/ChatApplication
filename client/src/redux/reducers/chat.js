@@ -25,7 +25,11 @@ const chatSlice = createSlice({
     setNewMessagesAlert: (state, action) => {
       const chatId = action.payload.chatId;
       const index = state.newMessagesAlert.findIndex((item) => item.chatId === chatId);
-      index !== -1 ? (state.newMessagesAlert[index].count += 1) : state.newMessagesAlert?.push({ chatId, count: 1 });
+      if (index !== -1) {
+        state.newMessagesAlert[index].count += 1;
+      } else {
+        state.newMessagesAlert?.push({ chatId, count: 1 });
+      }
     },
     removeNewMessagesAlert: (state, action) => {
       state.newMessagesAlert = state.newMessagesAlert.filter((item) => item.chatId !== action.payload);

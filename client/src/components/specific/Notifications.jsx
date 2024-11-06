@@ -21,7 +21,7 @@ const Notifications = () => {
         toast.success(res?.data?.message);
       } else toast.error(res?.data?.error?.message || "Something went wrong");
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Something went wrong in frontend");
       console.log(error);
     }
   };
