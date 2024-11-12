@@ -162,4 +162,3 @@ const adminData = async (req, res) => {
 };
 
 export { adminData, adminLogin, adminLogout, allChats, allMessages, allUsers, dashboard };
-

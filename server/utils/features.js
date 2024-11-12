@@ -21,8 +21,8 @@ export const sendToken = (res, user, code, message) => {
 
     return res.status(code).cookie("token", token, cookieOptions).send({
       success: true,
-      message: message,
-      result: user,
+      user,
+      message,
     });
   } catch (error) {
     res.send({ message: message, error: error.message });
