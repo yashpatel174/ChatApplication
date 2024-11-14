@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSocket } from "../../Socket";
-import { new_message_alert, new_request, refetch_chats } from "../../constants/events";
+import { new_message_alert, new_request, online_users, refetch_chats } from "../../constants/events";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { saveFromStorage } from "../../lib/features";
 import { useMyChatsQuery } from "../../redux/api/api";
@@ -61,10 +61,15 @@ const AppLayout = () => (WrappedComponent) => {
       navigate("/");
     }, [refetch, navigate]);
 
+    const onlineUsersListener = useCallback((data) => {
+      console.log(data, "listener");
+    }, []);
+
     const eventHandlers = {
       [new_message_alert]: newMsgAlertListener,
       [new_request]: newReqListener,
       [refetch_chats]: refetchListener,
+      [online_users]: onlineUsersListener,
     };
     useSocketEvents(socket, eventHandlers);
 

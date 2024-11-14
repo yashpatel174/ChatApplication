@@ -3,19 +3,19 @@ import { AttachFile as AttachFileIcon, Send as SendIcon } from "@mui/icons-mater
 import { IconButton, Skeleton, Stack } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import FileMenu from "../components/dialogs/FileMenu";
 import AppLayout from "../components/layout/AppLayout";
+import { TypingLoader } from "../components/layout/Loaders";
 import MessageComponent from "../components/shared/MessageComponent";
 import { InputBox } from "../components/styles/StyledComponents";
 import { grayColor, orange } from "../constants/color";
-import { alert, new_message, start_typing, stop_typing } from "../constants/events";
+import { alert, chat_joined, chat_leave, new_message, start_typing, stop_typing } from "../constants/events";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { removeNewMessagesAlert } from "../redux/reducers/chat";
 import { setIsFileMenu } from "../redux/reducers/misc";
 import { useSocket } from "../Socket";
-import { TypingLoader } from "../components/layout/Loaders";
-import { useNavigate } from "react-router-dom";
 
 const Chat = ({ chatId, user }) => {
   const [message, setMessage] = useState("");
@@ -70,14 +70,16 @@ const Chat = ({ chatId, user }) => {
   };
 
   useEffect(() => {
+    socket.emit(chat_joined, { userId: user._id, members });
     dispatch(removeNewMessagesAlert(chatId));
     return () => {
       setMessages([]);
       setMessage("");
       setOldMsgs([]);
       setPage(1);
+      socket.emit(chat_leave, { userId: user._id, members });
     };
-  }, [chatId]);
+  }, [chatId, socket]);
 
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth" });

@@ -1,9 +1,11 @@
-import { Avatar, Stack } from "@mui/material";
+import { useFetchData } from "6pp";
+import { Avatar, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import AvatarCard from "../../components/shared/AvatarCard";
 import Table from "../../components/shared/Table";
-import { dashboardData } from "../../constants/sampleData";
+import { server } from "../../constants/config";
+import { useErrors } from "../../hooks/hook";
 import { transformImage } from "../../lib/features";
 
 const columns = [
@@ -24,7 +26,13 @@ const columns = [
     field: "name",
     headerName: "Name",
     headerClassName: "table-header",
-    width: 300,
+    width: 150,
+  },
+  {
+    field: "groupChat",
+    headerName: "Group",
+    headerClassName: "table-header",
+    width: 100,
   },
   {
     field: "totalMembers",
@@ -36,7 +44,7 @@ const columns = [
     field: "members",
     headerName: "Members",
     headerClassName: "table-header",
-    width: 400,
+    width: 250,
     renderCell: (params) => (
       <AvatarCard
         max={100}
@@ -54,7 +62,7 @@ const columns = [
     field: "creator",
     headerName: "Created By",
     headerClassName: "table-header",
-    width: 250,
+    width: 150,
     renderCell: (params) => (
       <Stack
         direction="row"
@@ -72,29 +80,48 @@ const columns = [
 ];
 
 const ChatManagement = () => {
+  const { loading, data, error } = useFetchData(`${server}/admin/chats`, "dashboard-chats");
+  const { result } = data || {};
+
+  useErrors([
+    {
+      isError: error,
+      error: error,
+    },
+  ]);
+
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    setRows(
-      dashboardData?.chats?.map((i) => ({
-        ...i,
-        id: i._id,
-        avartar: i.avatar?.map((i) => transformImage(i, 50)),
-        members: i.members?.map((i) => transformImage(i.avatar, 50)),
-        creator: {
-          name: i.creator.name,
-          avatar: transformImage(i.creator.avatar, 50),
-        },
-      }))
-    );
-  }, []);
+    if (result) {
+      setRows(
+        result?.map((i) => ({
+          ...i,
+          id: i._id,
+          avartar: i.avatar?.map((i) => transformImage(i, 50)),
+          members: i.members?.map((i) => transformImage(i.avatar, 50)),
+          creator: {
+            name: i.creator.name,
+            avatar: transformImage(i.creator.avatar, 50),
+          },
+          totalMessages: i.creator.totalMessages,
+          totalMembers: i.creator.totalMembers,
+          groupChat: i.groupChat,
+        }))
+      );
+    }
+  }, [result]);
   return (
     <AdminLayout>
-      <Table
-        heading={"All Chats"}
-        columns={columns}
-        rows={rows}
-      />
+      {loading ? (
+        <Skeleton height={"100vh"} />
+      ) : (
+        <Table
+          heading={"All Chats"}
+          columns={columns}
+          rows={rows}
+        />
+      )}
     </AdminLayout>
   );
 };

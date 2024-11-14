@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 import { database } from "./utils/features.js";
 import { v2 as cloudinary } from "cloudinary";
 import { corsOptions } from "./constants/config.js";
-import { new_message, new_message_alert, start_typing, stop_typing } from "./constants/events.js";
+import { chat_joined, chat_leave, new_message, new_message_alert, online_users, start_typing, stop_typing } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { socketAuth } from "./middlewares/auth.js";
 import { messageModel } from "./models/messageModel.js";
@@ -25,6 +25,7 @@ const server = createServer(app);
 const io = new Server(server, { cors: corsOptions });
 app.set("io", io);
 export const userSocketId = new Map();
+export const onlineUsers = new Set();
 
 // Middlewares
 app.use(express.json());
@@ -80,6 +81,18 @@ io.on("connection", (socket) => {
   socket.on(stop_typing, ({ members, chatId }) => {
     const membersSocket = getSockets(members);
     socket.to(membersSocket).emit(stop_typing, { chatId });
+  });
+
+  socket.on(chat_joined, ({ userId, members }) => {
+    onlineUsers.add(userId.toString());
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(online_users, Array.from(onlineUsers));
+  });
+
+  socket.on(chat_leave, ({ userId, members }) => {
+    onlineUsers.delete(userId.toString());
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(online_users, Array.from(onlineUsers));
   });
 
   socket.on("disconnect", () => {

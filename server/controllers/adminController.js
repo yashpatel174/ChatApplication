@@ -45,6 +45,7 @@ const allUsers = async (req, res) => {
           avatar: avatar.url,
           _id,
           groups,
+          friends,
         };
       })
     );
@@ -147,7 +148,7 @@ const dashboard = async (req, res) => {
 
     const stats = { groupsCount, usersCount, messagesCount, chatCount, messagesChart: messages };
 
-    return response(res, "", 200, stats);
+    return response(res, "Data fetched successfully.", 200, stats);
   } catch (error) {
     response(res, "Error while getting data", 500, error.message);
   }
