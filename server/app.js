@@ -69,7 +69,7 @@ io.on("connection", (socket) => {
       const message = new messageModel(dbMessage);
       await message.save();
     } catch (error) {
-      console.log(error.message);
+      throw new Error(error.message);
     }
   });
 
@@ -96,8 +96,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
     userSocketId.delete(user._id.toString());
+    onlineUsers.delete(user._id.toString());
+    socket.broadcast.emit(online_users, Array.from(onlineUsers));
   });
 });
 

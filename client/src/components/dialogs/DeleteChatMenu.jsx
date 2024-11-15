@@ -13,8 +13,6 @@ const DeleteChatMenu = ({ dispatch, deleteMenuAnchor }) => {
   const [deleteChat, _, deleteChatData] = useAsyncMutation(useDeleteChatMutation);
   const [leaveGroup, __, leaveGroupData] = useAsyncMutation(useLeaveGroupMutation);
 
-  console.log(selectedDeleteChat, "selectedDeleteChat");
-
   const isGroup = selectedDeleteChat.groupChat;
 
   const closeHandler = () => {

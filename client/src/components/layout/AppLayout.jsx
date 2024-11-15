@@ -1,5 +1,5 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSocket } from "../../Socket";
@@ -21,9 +21,11 @@ const AppLayout = () => (WrappedComponent) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const socket = useSocket();
+    const deleteMenuAnchor = useRef(null);
 
     const chatId = params.chatId;
-    const deleteMenuAnchor = useRef(null);
+
+    const [onlineUsers, setOnlineUsers] = useState();
 
     const { isMobile } = useSelector((state) => state.misc);
     const { user } = useSelector((state) => state.auth);
@@ -61,9 +63,7 @@ const AppLayout = () => (WrappedComponent) => {
       navigate("/");
     }, [refetch, navigate]);
 
-    const onlineUsersListener = useCallback((data) => {
-      console.log(data, "listener");
-    }, []);
+    const onlineUsersListener = useCallback((data) => setOnlineUsers(data), [data]);
 
     const eventHandlers = {
       [new_message_alert]: newMsgAlertListener,

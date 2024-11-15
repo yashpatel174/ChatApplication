@@ -24,9 +24,7 @@ const AddMemberComp = ({ chatId }) => {
     closeHandler();
   };
 
-  const closeHandler = () => {
-    dispatch(setIsAddMember(false));
-  };
+  const closeHandler = () => dispatch(setIsAddMember(false));
 
   useErrors([{ isError, error }]);
   return (

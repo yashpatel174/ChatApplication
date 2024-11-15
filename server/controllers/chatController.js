@@ -268,7 +268,6 @@ const getMessages = async (req, res) => {
 
     response(res, "", 200, [messages.reverse(), totalPages]);
   } catch (error) {
-    console.log(error.message, "backend error");
     response(res, "Error while getting messages.", 500, error.message);
   }
 };

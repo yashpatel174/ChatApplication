@@ -1,15 +1,15 @@
 import { Add as AddIcon, Group as GroupIcon, Logout as LogoutIcon, Menu as MenuIcon, Notifications as NotificationsIcon, Search as SearchIcon } from "@mui/icons-material";
 import { AppBar, Backdrop, Badge, Box, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
-import React, { lazy, Suspense, useState } from "react";
+import React, { lazy, Suspense } from "react";
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { orange } from "../../constants/color";
 import { server } from "../../constants/config";
 import { userNotExists } from "../../redux/reducers/auth";
-import { setIsMobile, setIsNewGroup, setIsNotification, setIsSearch } from "../../redux/reducers/misc";
 import { resetNotification } from "../../redux/reducers/chat";
+import { setIsMobile, setIsNewGroup, setIsNotification, setIsSearch } from "../../redux/reducers/misc";
 
 const Search = lazy(() => import("../specific/Search"));
 const Notification = lazy(() => import("../specific/Notifications"));
@@ -18,7 +18,6 @@ const NewGroup = lazy(() => import("../specific/NewGroup"));
 const Header = () => {
   const { isSearch, isNotification, isNewGroup } = useSelector((state) => state.misc);
   const { notificationCount } = useSelector((state) => state.chat);
-  console.log(notificationCount, "notificationCount");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -124,8 +123,6 @@ const Header = () => {
 };
 
 const IconBtn = ({ title, icon, onClick, value }) => {
-  console.log(value, "value");
-
   return (
     <Tooltip title={title}>
       <IconButton
