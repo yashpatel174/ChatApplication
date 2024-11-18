@@ -85,9 +85,9 @@ const Chat = ({ chatId, user }) => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    if (!chatDetails.data?.result) return navigate("/");
-  }, [chatDetails.data]);
+  // useEffect(() => {
+  //   if (!chatDetails.data?.result) return navigate("/");
+  // }, [chatDetails.data]);
 
   const newMessagesListener = useCallback(
     (data) => {

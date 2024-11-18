@@ -16,7 +16,6 @@ const Notifications = () => {
   };
   const handleCloseNotification = () => dispatch(setIsNotification(false));
   useErrors([{ error, isError }]);
-  console.log(data?.result);
 
   return (
     <>
